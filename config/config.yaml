@@ -1,0 +1,15 @@
+env: "dev"
+http_server:
+  address: "localhost:8001" # адрес сервера
+  timeout: 4s
+  idle_timeout: 60s
+postgres:
+  host: "localhost" # адрес БД
+  port: "5432" # порт БД
+  user: "wbtest" # юзер БД
+  password: "wbtest" # пароль БД
+  db_name: "wbtest" # имя БД
+nats:
+  cluster_id: "test-cluster" # имя кластера
+  client_id: "client-123" # имя клиента
+  url: "nats://localhost:4222" # ссылка для подключения к nats

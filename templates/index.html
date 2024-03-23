@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Проверка заказа</title>
+    <style>
+        #jsonResult {
+            white-space: pre-wrap;
+            background-color: #f4f4f4;
+            padding: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<h2>Введите ID заказа</h2>
+<form id="orderForm">
+    <input type="text" id="orderId" name="orderId" required>
+    <button type="submit">Проверить заказ</button>
+</form>
+<div id="orderResult"></div>
+<pre id="jsonResult"></pre>
+
+<script>
+    document.getElementById('orderForm').onsubmit = function(event) {
+        event.preventDefault();
+        var orderId = document.getElementById('orderId').value;
+        fetch(`http://localhost:8001/api/order/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Заказ не найден');
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('jsonResult').textContent = JSON.stringify(data, null, 2);
+
+                var itemsHtml = data.items.map(item => `
+                    <li>
+                        Наименование: ${item.name}, Цена: ${item.price}, Кол-во: ${item.sale}, Размер: ${item.size}, Цена всего: ${item.total_price}, Бренд: ${item.brand}, Статус: ${item.status}
+                    </li>`).join('');
+
+                var resultHtml = `
+                    <h3>Заказ ${data.order_uid}</h3>
+                    <p><strong>Номер отслеживания:</strong> ${data.track_number}</p>
+                    <p><strong>Customer ID:</strong> ${data.customer_id}</p>
+                    <p><strong>Служба доставки:</strong> ${data.delivery_service}</p>
+                    <p><strong>Дата создания:</strong> ${data.date_created}</p>
+                    <h4>Доставка</h4>
+                    <p>${data.delivery.name}</p>
+                    <p>${data.delivery.phone}</p>
+                    <p>${data.delivery.zip}</p>
+                    <p>${data.delivery.city}, ${data.delivery.address}</p>
+                    <p>${data.delivery.region}</p>
+                    <p>${data.delivery.email}</p>
+                    <h4>Оплата</h4>
+                    <p>${data.payment.transaction}</p>
+                    <p>${data.payment.amount} ${data.payment.currency}</p>
+                    <p>Банк: ${data.payment.bank}</p>
+                    <p>Стоимость доставки: ${data.payment.delivery_cost}</p>
+                    <p>Общая стоимость товаров: ${data.payment.goods_total}</p>
+                    <p>Комиссия: ${data.payment.custom_fee}</p>
+                    <h4>Товары</h4>
+                    <ul>${itemsHtml}</ul>
+                `;
+                document.getElementById('orderResult').innerHTML = resultHtml;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('orderResult').textContent = 'Ошибка при получении данных заказа.';
+                document.getElementById('jsonResult').textContent = '';
+            });
+    };
+</script>
+</body>
+</html>
