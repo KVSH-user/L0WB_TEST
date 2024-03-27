@@ -17,11 +17,11 @@ func main() {
 
 	// тестовые данные
 	order := entity.Order{
-		OrderUID:    "test1223",
+		OrderUID:    "wborder",
 		TrackNumber: "TN123456",
 		Entry:       "entry1",
 		Delivery: entity.Delivery{
-			Name:    "John Gee",
+			Name:    "John Wb",
 			Phone:   "+1234567890",
 			Zip:     "12345",
 			City:    "City Name",
